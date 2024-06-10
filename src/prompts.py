@@ -1,7 +1,7 @@
 import streamlit as st
 
-SCHEMA_PATH = st.secrets.get("SCHEMA_PATH", "FROSTY_SAMPLE.CYBERSYN_FINANCIAL")
-QUALIFIED_TABLE_NAME = f"{SCHEMA_PATH}.FINANCIAL_ENTITY_ANNUAL_TIME_SERIES"
+SCHEMA_PATH = st.secrets.get("SCHEMA_PATH", "lansample.public")
+QUALIFIED_TABLE_NAME = f"{SCHEMA_PATH}.lansample"
 TABLE_DESCRIPTION = """
 This table has various metrics for financial entities (also referred to as banks) since 1983.
 The user may describe the entities interchangeably as banks, financial institutions, or financial entities.
@@ -10,7 +10,7 @@ The user may describe the entities interchangeably as banks, financial instituti
 # Since this is a deep table, it's useful to tell Frosty what variables are available.
 # Similarly, if you have a table with semi-structured data (like JSON), it could be used to provide hints on available keys.
 # If altering, you may also need to modify the formatting logic in get_table_context() below.
-METADATA_QUERY = f"SELECT VARIABLE_NAME, DEFINITION FROM {SCHEMA_PATH}.FINANCIAL_ENTITY_ATTRIBUTES_LIMITED;"
+METADATA_QUERY = f"SELECT PROVIDER_NAME, latency FROM {SCHEMA_PATH}.lansample;"
 
 GEN_SQL = """
 You will be acting as an AI Snowflake SQL Expert named Frosty.
@@ -74,11 +74,11 @@ Here are the columns of the {'.'.join(table)}
         metadata = conn.query(metadata_query, show_spinner=False)
         metadata = "\n".join(
             [
-                f"- **{metadata['VARIABLE_NAME'][i]}**: {metadata['DEFINITION'][i]}"
-                for i in range(len(metadata["VARIABLE_NAME"]))
+                f"- **{metadata['PROVIDER_NAME'][i]}**: {metadata['LATENCY'][i]}"
+                for i in range(len(metadata["PROVIDER_NAME"]))
             ]
         )
-        context = context + f"\n\nAvailable variables by VARIABLE_NAME:\n\n{metadata}"
+        context = context + f"\n\nAvailable variables by provider_NAME:\n\n{metadata}"
     return context
 
 def get_system_prompt():
